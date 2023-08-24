@@ -10,10 +10,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin {
 
-	@Inject(method = "tick", at = @At("TAIL"))
-	private void spawnZombies(CallbackInfo ci) {
-		((MinecraftServer)(Object)this)
-				.getWorlds()
-				.forEach(RandomItemSpawnerMod::spawnItems);
-	}
+  @Inject(method = "tick", at = @At("TAIL"))
+  private void spawnZombies(CallbackInfo ci) {
+    ((MinecraftServer)(Object)this)
+        .getWorlds()
+        .forEach(RandomItemSpawnerMod::spawnItems);
+  }
 }
