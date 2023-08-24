@@ -4,7 +4,11 @@ import it.unimi.dsi.fastutil.objects.ObjectImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.InfestedBlock;
+import net.minecraft.block.SpawnerBlock;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
@@ -21,6 +25,34 @@ public class RandomItemSpawnerMod implements ModInitializer {
   private static boolean initialized;
   private static List<List<Identifier>> itemCache;
 
+  private static boolean isItemNotAllowed(Item item) {
+    if (item instanceof SpawnEggItem || item instanceof OperatorOnlyBlockItem ||
+        item instanceof SkullItem) {
+      return false;
+    }
+
+    if (item.equals(Items.COMMAND_BLOCK_MINECART)) {
+      return false;
+    }
+
+    if (item instanceof BlockItem blockItem) {
+      var block = blockItem.getBlock();
+      var notAllowedBlocks = List.of(
+          Blocks.END_PORTAL_FRAME, Blocks.BEDROCK, Blocks.BUDDING_AMETHYST,
+          Blocks.CHORUS_PLANT, Blocks.DIRT_PATH, Blocks.FARMLAND,
+          Blocks.FROGSPAWN, Blocks.REINFORCED_DEEPSLATE, Blocks.LIGHT,
+          Blocks.PETRIFIED_OAK_SLAB);
+      if (notAllowedBlocks.contains(block)) {
+        return false;
+      }
+
+      if (block instanceof InfestedBlock || block instanceof SpawnerBlock) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   private static String getName(Identifier id) {
     var idx = id.getPath().lastIndexOf("/");
     return id.getPath().substring(idx + 1).toLowerCase();
@@ -35,6 +67,10 @@ public class RandomItemSpawnerMod implements ModInitializer {
       cache.add(new ArrayList<Identifier>());
     }
     for (var id : Registries.ITEM.getIds()) {
+      var item = Registries.ITEM.get(id);
+      if (isItemNotAllowed(item)) {
+        continue;
+      }
       var chr = getName(id).charAt(0);
       if (Character.isAlphabetic(chr)) {
         cache.get(chr - 'a').add(id);
