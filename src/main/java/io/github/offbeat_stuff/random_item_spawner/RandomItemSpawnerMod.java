@@ -21,6 +21,11 @@ public class RandomItemSpawnerMod implements ModInitializer {
   private static boolean initialized;
   private static List<List<Identifier>> itemCache;
 
+  private static String getName(Identifier id) {
+    var idx = id.getPath().lastIndexOf("/");
+    return id.getPath().substring(idx + 1).toLowerCase();
+  }
+
   private static void initCache() {
     if (initialized) {
       return;
@@ -30,7 +35,7 @@ public class RandomItemSpawnerMod implements ModInitializer {
       cache.add(new ArrayList<Identifier>());
     }
     for (var id : Registries.ITEM.getIds()) {
-      var chr = id.getNamespace().toLowerCase().charAt(0);
+      var chr = getName(id).charAt(0);
       if (Character.isAlphabetic(chr)) {
         cache.get(chr - 'a').add(id);
       }
@@ -41,16 +46,21 @@ public class RandomItemSpawnerMod implements ModInitializer {
     initialized = true;
   }
 
+  private static int cooldown = 0;
+
   public static void spawnItems(ServerWorld world) {
-    initCache();
+    if (!initialized) {
+      return;
+    }
+    if (cooldown > 0) {
+      cooldown--;
+      return;
+    }
     var player = world.getClosestPlayer(0, world.getBottomY(), 0, 2, true);
     if (player == null) {
       return;
     }
     if (!player.isOnGround() || !player.isSneaking()) {
-      return;
-    }
-    if (world.getRandom().nextInt(40) > 0) {
       return;
     }
     var playerName = player.getEntityName().toLowerCase();
@@ -65,6 +75,7 @@ public class RandomItemSpawnerMod implements ModInitializer {
     var itemEntity = new ItemEntity(world, player.getPos().x, player.getPos().y,
                                     player.getPos().z, item.getDefaultStack());
     world.spawnEntity(itemEntity);
+    cooldown = 40 + world.getRandom().nextInt(40);
   }
 
   @Override
@@ -72,7 +83,7 @@ public class RandomItemSpawnerMod implements ModInitializer {
     // This code runs as soon as Minecraft is in a mod-load-ready state.
     // However, some things (like resources) may still be uninitialized.
     // Proceed with mild caution.
-
-    LOGGER.info("Hello Fabric world!");
+    LOGGER.info("Intializing item cache in random item spawner mod");
+    initCache();
   }
 }
