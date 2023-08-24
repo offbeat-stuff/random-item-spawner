@@ -52,15 +52,15 @@ public class RandomItemSpawnerMod implements ModInitializer {
     if (!initialized) {
       return;
     }
-    if (cooldown > 0) {
-      cooldown--;
-      return;
-    }
     var player = world.getClosestPlayer(0, world.getBottomY(), 0, 2, true);
     if (player == null) {
       return;
     }
     if (!player.isOnGround() || !player.isSneaking()) {
+      return;
+    }
+    if (cooldown > 0) {
+      cooldown--;
       return;
     }
     var playerName = player.getEntityName().toLowerCase();
@@ -75,7 +75,7 @@ public class RandomItemSpawnerMod implements ModInitializer {
     var itemEntity = new ItemEntity(world, player.getPos().x, player.getPos().y,
                                     player.getPos().z, item.getDefaultStack());
     world.spawnEntity(itemEntity);
-    cooldown = 40 + world.getRandom().nextInt(40);
+    cooldown = 400 + world.getRandom().nextInt(200);
   }
 
   @Override
