@@ -100,6 +100,9 @@ public class RandomItemSpawnerMod implements ModInitializer {
     }
     var f = world.getRandom().nextInt(items.size());
     var item = Registries.ITEM.get(items.get(f));
+    if (!item.getRequiredFeatures().isSubsetOf(world.getEnabledFeatures())) {
+      return;
+    }
     var itemEntity = new ItemEntity(world, player.getPos().x, player.getPos().y,
                                     player.getPos().z, item.getDefaultStack());
     world.spawnEntity(itemEntity);
