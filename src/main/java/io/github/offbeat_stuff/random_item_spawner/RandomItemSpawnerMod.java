@@ -26,7 +26,7 @@ public class RandomItemSpawnerMod implements ModInitializer {
   private static boolean initialized;
   private static List<List<Identifier>> itemCache;
 
-  private static boolean isItemNotAllowed(Item item) {
+  private static boolean isItemAllowed(Item item) {
     if (item instanceof SpawnEggItem || item instanceof OperatorOnlyBlockItem ||
         item instanceof SkullItem) {
       return false;
@@ -68,7 +68,7 @@ public class RandomItemSpawnerMod implements ModInitializer {
     }
     for (var id : Registries.ITEM.getIds()) {
       var item = Registries.ITEM.get(id);
-      if (isItemNotAllowed(item)) {
+      if (!isItemAllowed(item)) {
         continue;
       }
       var chr = getName(id).charAt(0);
@@ -127,6 +127,14 @@ public class RandomItemSpawnerMod implements ModInitializer {
     cooldown = 400 + world.getRandom().nextInt(200);
   }
 
+  private static void debugLog() {
+    for (int i = 0; i < itemCache.size(); i++) {
+      var chr = Character.toString('a' + (char)i);
+      LOGGER.info("{} -> {}", chr, itemCache.get(i).size());
+      LOGGER.info("{} -> {}", chr, itemCache.get(i));
+    }
+  }
+
   @Override
   public void onInitialize() {
     // This code runs as soon as Minecraft is in a mod-load-ready state.
@@ -134,5 +142,6 @@ public class RandomItemSpawnerMod implements ModInitializer {
     // Proceed with mild caution.
     LOGGER.info("Intializing item cache in random item spawner mod");
     initCache();
+    // debugLog();
   }
 }
