@@ -46,9 +46,8 @@ public class RandomItemSpawnerMod implements ModInitializer {
         return false;
       }
 
-      if (block instanceof InfestedBlock || block instanceof SpawnerBlock) {
-        return false;
-      }
+      return !(block instanceof InfestedBlock) &&
+          !(block instanceof SpawnerBlock);
     }
     return true;
   }
@@ -64,7 +63,7 @@ public class RandomItemSpawnerMod implements ModInitializer {
     }
     var cache = new ArrayList<List<Identifier>>();
     for (int i = 0; i < 26; i++) {
-      cache.add(new ArrayList<Identifier>());
+      cache.add(new ArrayList<>());
     }
     for (var id : Registries.ITEM.getIds()) {
       var item = Registries.ITEM.get(id);
