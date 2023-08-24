@@ -88,7 +88,7 @@ public class RandomItemSpawnerMod implements ModInitializer {
     if (!initialized) {
       return;
     }
-    var player = world.getClosestPlayer(0, world.getBottomY(), 0, 2, true);
+    var player = world.getClosestPlayer(0.5, world.getBottomY(), 0.5, 2, true);
     if (player == null) {
       return;
     }
