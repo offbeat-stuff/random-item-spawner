@@ -8,6 +8,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.InfestedBlock;
 import net.minecraft.block.SpawnerBlock;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.world.ServerWorld;
@@ -83,6 +84,27 @@ public class RandomItemSpawnerMod implements ModInitializer {
 
   private static int cooldown = 0;
 
+  private static void spawnItem(ServerWorld world, PlayerEntity player) {
+    var playerName = player.getEntityName().toLowerCase();
+    if (playerName.isBlank()) {
+      return;
+    }
+    var index = world.getRandom().nextInt(playerName.length());
+    var character = playerName.charAt(index);
+    if (!Character.isAlphabetic(character)) {
+      return;
+    }
+    var items = itemCache.get(character - 'a');
+    if (items.isEmpty()) {
+      return;
+    }
+    var f = world.getRandom().nextInt(items.size());
+    var item = Registries.ITEM.get(items.get(f));
+    var itemEntity = new ItemEntity(world, player.getPos().x, player.getPos().y,
+                                    player.getPos().z, item.getDefaultStack());
+    world.spawnEntity(itemEntity);
+  }
+
   public static void spawnItems(ServerWorld world) {
     if (!initialized) {
       return;
@@ -98,18 +120,7 @@ public class RandomItemSpawnerMod implements ModInitializer {
       cooldown--;
       return;
     }
-    var playerName = player.getEntityName().toLowerCase();
-    var index = world.getRandom().nextInt(playerName.length());
-    var character = playerName.charAt(index);
-    if (!Character.isAlphabetic(character)) {
-      return;
-    }
-    var items = itemCache.get(character - 'a');
-    var f = world.getRandom().nextInt(items.size());
-    var item = Registries.ITEM.get(items.get(f));
-    var itemEntity = new ItemEntity(world, player.getPos().x, player.getPos().y,
-                                    player.getPos().z, item.getDefaultStack());
-    world.spawnEntity(itemEntity);
+    spawnItem(world, player);
     cooldown = 400 + world.getRandom().nextInt(200);
   }
 
