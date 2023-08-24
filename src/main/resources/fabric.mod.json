@@ -16,7 +16,7 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"io.github.offbeat_stuff.random_item_spawner.ExampleMod"
+			"io.github.offbeat_stuff.random_item_spawner.RandomItemSpawnerMod"
 		]
 	},
 	"mixins": [

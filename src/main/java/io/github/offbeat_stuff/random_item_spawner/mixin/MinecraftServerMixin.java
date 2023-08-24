@@ -1,5 +1,6 @@
 package io.github.offbeat_stuff.random_item_spawner.mixin;
 
+import io.github.offbeat_stuff.random_item_spawner.RandomItemSpawnerMod;
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -7,9 +8,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MinecraftServer.class)
-public class ExampleMixin {
-	@Inject(at = @At("HEAD"), method = "loadWorld")
-	private void init(CallbackInfo info) {
-		// This code is injected into the start of MinecraftServer.loadWorld()V
+public abstract class MinecraftServerMixin {
+
+	@Inject(method = "tick", at = @At("TAIL"))
+	private void spawnZombies(CallbackInfo ci) {
+		((MinecraftServer)(Object)this)
+				.getWorlds()
+				.forEach(RandomItemSpawnerMod::spawnItems);
 	}
 }
